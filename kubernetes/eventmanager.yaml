@@ -49,3 +49,15 @@ spec:
         image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
         name: eventmanager
       restartPolicy: Always
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eventmanager
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    app: eventmanager

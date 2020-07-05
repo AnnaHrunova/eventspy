@@ -70,4 +70,3 @@ stages:
               action: deploy
               manifests: |
                 $(Pipeline.Workspace)/kubernetes/eventmanager.yaml
-                $(Pipeline.Workspace)/kubernetes/loadbalancer.yaml
