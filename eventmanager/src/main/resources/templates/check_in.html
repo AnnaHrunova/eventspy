@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+    $(function() {
+      checkin();
+    });
+
+    function checkin() {
+      console.log("log");
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        console.log("error");
+      }
+    }
+
+    function showPosition(position) {
+      console.log(position.coords.latitude + " " + position.coords.longitude);
+      var request = {applicationReference: [[${applicationReference}]], lon: position.coords.longitude, lat: position.coords.latitude}
+      $.ajax({
+        type : "POST",
+        contentType : 'application/json; charset=utf-8',
+        dataType : 'json',
+        url : "/check-in",
+        data : JSON.stringify(request),
+        success : function(result) {
+          console.log("SUCCESS: ", data);
+        },
+        error: function(e){
+          console.log("ERROR: ", e);
+        },
+        done : function(e) {
+          console.log("DONE");
+        }
+      });
+    }
+</script>
+
+<div>Please, press button to check in</div>

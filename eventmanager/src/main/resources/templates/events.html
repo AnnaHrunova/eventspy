@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<style th:replace="styles/styles.html :: design">
+</style>
+
+<body>
+<div><img th:src="@{/images/logo-2.png}"/></div>
+<div th:switch="${events}">
+  <h2 th:case="null">No events yet!</h2>
+  <div th:case="*">
+    <table class="darkTable">
+      <thead>
+      <tr>
+        <th>Organizer</th>
+        <th>Platform</th>
+        <th>Code</th>
+        <th>+</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="event : ${events}">
+        <td th:text="${event.organizer}"></td>
+        <td th:text="${event.platform}"></td>
+        <td th:text="${event.code}"></td>
+        <td><a th:href="@{/events/details/} + ${event.code}">Edit/Details</a></td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <p><a href="/events/register">Add Event</a></p>
+</div>
+</body>

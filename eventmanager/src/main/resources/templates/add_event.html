@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<style th:replace="styles/styles.html :: design">
+</style>
+
+<form action="#" th:action="@{/events/register}" th:object="${event}" method="post">
+  <table class="darkTable" style="width: 70%">
+    <thead>    </thead>
+    <tr>
+      <td>
+        <label for="name">Name</label>
+      </td>
+      <td>
+        <input type="text" th:field="*{name}" id="name" placeholder="Name">
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="organizer">Organizer</label>
+      </td>
+      <td>
+        <input type="text" th:field="*{organizer}" id="organizer" placeholder="Organizer">
+        <span th:if="${#fields.hasErrors('organizer')}" th:errors="*{organizer}"></span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="platform">Platform</label>
+      </td>
+      <td>
+        <input type="text" th:field="*{platform}" id="platform" placeholder="Platform">
+        <span th:if="${#fields.hasErrors('platform')}" th:errors="*{platform}"></span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="address">Address</label>
+      </td>
+      <td>
+        <input type="text" th:field="*{address}" id="address" placeholder="Address">
+        <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="totalSpots">Total Spots</label>
+      </td>
+      <td>
+        <input type="text" th:field="*{totalSpots}" id="totalSpots">
+        <span th:if="${#fields.hasErrors('totalSpots')}" th:errors="*{totalSpots}"></span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="eventStart">Event Start</label>
+      </td>
+      <td>
+        <input type="datetime-local" th:field="*{eventStart}" id="eventStart">
+        <span th:if="${#fields.hasErrors('eventStart')}" th:errors="*{eventStart}"></span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="eventEnd">Event End</label>
+      </td>
+      <td>
+        <input type="datetime-local" th:field="*{eventEnd}" id="eventEnd">
+        <span th:if="${#fields.hasErrors('eventEnd')}" th:errors="*{eventEnd}"></span>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label for="rate">Rate</label>
+      </td>
+      <td>
+        <input type="text" th:field="*{rate}" id="rate">
+        <span th:if="${#fields.hasErrors('rate')}" th:errors="*{rate}"></span>
+      </td>
+    </tr>
+  </table>
+
+  <input type="submit" value="Save">
+</form>

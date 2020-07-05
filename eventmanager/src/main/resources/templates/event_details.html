@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<style th:replace="styles/styles.html :: design">
+</style>
+
+<div><img th:src="@{/images/logo-2.png}"/></div>
+
+<form action="#" th:action="@{/events/update/} + ${eventDetails.code}" th:object="${eventDetails}" method="post">
+
+  <table class="darkTable" style="width: 70%">
+    <thead>    </thead>
+
+    <tr>
+      <td>
+        <label class="details-align">Name</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{name}"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align">Code</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{code}" id="code"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="organizer">Organizer</label>
+      </td>
+      <td><div class="details-align" th:text="*{organizer}" id="organizer"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="platform">Platform</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{platform}" id="platform"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="address">Address</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{address}" id="address"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="coordinates">Coordinates</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{coordinates}" id="coordinates"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="freeSpots">Free Spots</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{freeSpots}" id="freeSpots"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="reservedSpots">Reserved Spots</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{reservedSpots}" id="reservedSpots"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="totalSpots">Total Spots</label>
+      </td>
+
+      <td>
+        <div class="details-align" th:text="*{totalSpots}" id="totalSpots"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="eventStart">Event Start</label>
+      <td>
+        <div class="details-align" th:text="*{eventStart}" id="eventStart"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="eventEnd">Event End</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{eventEnd}" id="eventEnd"></div>
+      </td>
+    </tr>
+
+    <tr>
+      <td>
+        <label class="details-align" for="rate">Rate</label>
+      </td>
+      <td>
+        <div class="details-align" th:text="*{rate}" id="rate"></div>
+      </td>
+    </tr>
+  </table>
+</form>

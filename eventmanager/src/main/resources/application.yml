@@ -1,0 +1,28 @@
+azure:
+  maps:
+    live:
+      enabled: true
+  keyvault:
+    enabled: true
+    uri: https://settings-kv.vault.azure.net/
+    client-id: 43c02eb4-017e-4993-bb08-a3e709941b96
+    client-key: c31ca699-ae98-4828-9e6b-36b3dfc8bd18
+    tenant-id: d8472f8b-beb2-46b8-9c39-5267eb99d20d
+    secret:
+      keys: azureMapsUrl,azureMapsSubscription,eventGridEndpoint,eventGridKey
+  activedirectory:
+    tenant-id: a0180a5d-f614-46af-af02-0877860375b4
+    active-directory-groups: users
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          azure:
+            client-id: a2e97953-ec51-4bad-807f-99d8d84dd1d3
+            client-secret: q_yL6.yC1EYZ18tt4KpdlXEq9O__aelLcH
+  data:
+    mongodb:
+      database: eventspydb
+      uri: mongodb://eventspydb:lXL8XflWPt6Eqkl0PXpSbgxbvkIOLRdvqCvHaYIvyHzdJvR11DuhYRn7txdLqSmTvT8UacWXBkZV42SmUV6ctQ==@eventspydb.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@eventspydb@
