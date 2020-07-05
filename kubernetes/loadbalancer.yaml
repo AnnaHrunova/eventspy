@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: azure-k8s
+    service.beta.kubernetes.io/azure-dns-label-name: eventspy-mbdc
+  name: azure-load-balancer
+spec:
+  loadBalancerIP: 51.104.160.76
+  type: LoadBalancer
+  ports:
+    - port: 80
+  selector:
+    app: azure-load-balancer
