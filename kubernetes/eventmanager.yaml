@@ -42,12 +42,6 @@ spec:
         app: eventmanager
     spec:
       containers:
-      - env:
-        - name: CONNECTION_STRING
-          valueFrom:
-            secretKeyRef:
-              name: settings-kv
-              key: connection_string
         ports:
           - containerPort: 6000
         image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
