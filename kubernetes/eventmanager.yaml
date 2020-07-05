@@ -46,7 +46,7 @@ spec:
         - name: CONNECTION_STRING
           valueFrom:
             secretKeyRef:
-              name: evkv
+              name: settings-kv
               key: connection_string
         ports:
           - containerPort: 6000
