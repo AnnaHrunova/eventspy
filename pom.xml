@@ -35,6 +35,7 @@
 
 	<modules>
 		<module>eventmanager</module>
+		<module>gateway</module>
 	</modules>
 
 </project>

@@ -35,7 +35,7 @@ stages:
 
           echo 'Start Build'
 
-          cd eventmanager
+          cd gateway
           mvn compile jib:build
 
           echo 'Build complete'
@@ -69,4 +69,4 @@ stages:
             inputs:
               action: deploy
               manifests: |
-                $(Pipeline.Workspace)/kubernetes/eventmanager.yaml
+                $(Pipeline.Workspace)/kubernetes/3-gateway.yaml
