@@ -41,6 +41,8 @@ spec:
         tier: backend
         app: eventmanager
     spec:
+      nodeSelector:
+        "beta.kubernetes.io/os": linux
       containers:
       - env:
         - name: CONNECTION_STRING
@@ -48,6 +50,13 @@ spec:
           - containerPort: 80
         image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
         name: eventmanager
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 250m
+            memory: 256Mi
       restartPolicy: Always
 
 ---
