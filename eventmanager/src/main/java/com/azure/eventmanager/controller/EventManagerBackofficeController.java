@@ -40,7 +40,7 @@ public class EventManagerBackofficeController {
     private final CommunicationService communicationService;
     private final MlService mlService;
 
-    @PreAuthorize("hasRole('users')")
+//    @PreAuthorize("hasRole('users')")
     @PostMapping(value = "/register")
     public ModelAndView registerEvent(@Valid @ModelAttribute(EventSpy.Model.EVENT) RegisterEventRequest request,
                                       HttpServletRequest httpServletRequest) {
@@ -53,7 +53,7 @@ public class EventManagerBackofficeController {
         return new ModelAndView(String.format("redirect:events/%s/%s", request.getPlatform(), request.getOrganizer()));
     }
 
-    @PreAuthorize("hasRole('users')")
+//    @PreAuthorize("hasRole('users')")
     @GetMapping(value = "/register")
     public ModelAndView initRegisterEvent(HttpServletRequest httpServletRequest) {
         ModelAndView modelAndView = new ModelAndView(EventSpy.View.ADD_EVENT);
@@ -77,7 +77,7 @@ public class EventManagerBackofficeController {
         return modelAndView;
     }
 
-    @PreAuthorize("hasRole('users')")
+//    @PreAuthorize("hasRole('users')")
     @GetMapping(value = "/all")
     public ModelAndView showAllOrganizerEvents(HttpServletRequest request) {
         val username = request.getUserPrincipal().getName();
@@ -88,7 +88,7 @@ public class EventManagerBackofficeController {
         return modelAndView;
     }
 
-    @PreAuthorize("hasRole('users')")
+//    @PreAuthorize("hasRole('users')")
     @GetMapping(value = "/details/{code}")
     public ModelAndView getEventDetails(@PathVariable String code) {
         val event = eventManagerService.findByCode(code);
