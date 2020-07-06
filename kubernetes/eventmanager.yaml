@@ -4,57 +4,46 @@ kind: Service
 metadata:
   labels:
     project: eventspy
-    tier: backend
+    tier: frontend
     app: eventmanager
-  name: eventmanager
+  name: gateway
 spec:
+  type: LoadBalancer
   ports:
-  - name: http
-    port: 6000
-    targetPort: 6000
+    - name: http
+      port: 80
+      targetPort: 6000
   selector:
     project: eventspy
-    tier: backend
-    app: eventmanager
-status:
-  loadBalancer: {}
+    tier: frontend
+    app: gateway
+
 ---
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  name: gateway
   labels:
     project: eventspy
-    tier: backend
-    app: eventmanager
-  name: eventmanager
+    tier: frontend
+    app: gateway
 spec:
-  selector:
-    matchLabels:
-      app: eventmanager
   replicas: 1
   strategy:
     type: RollingUpdate
   template:
     metadata:
+      creationTimestamp: null
       labels:
         project: eventspy
-        tier: backend
-        app: eventmanager
+        tier: frontend
+        app: gateway
     spec:
-      nodeSelector:
-        "beta.kubernetes.io/os": linux
       containers:
-      - env:
-        - name: CONNECTION_STRING
-        ports:
-        - containerPort: 6000
-        image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
-        name: eventmanager
-        resources:
-          requests:
-            cpu: 100m
-            memory: 128Mi
-          limits:
-            cpu: 250m
-            memory: 256Mi
+        - name: gateway
+          env:
+            - name: CONFIG_SERVICE_PASSWORD
+          image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
+          ports:
+            - containerPort: 6000
       restartPolicy: Always
