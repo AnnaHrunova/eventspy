@@ -47,7 +47,7 @@ spec:
       - env:
         - name: CONNECTION_STRING
         ports:
-          - containerPort: 80
+        - containerPort: 80
         image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
         name: eventmanager
         resources:
