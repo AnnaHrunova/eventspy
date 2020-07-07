@@ -1,72 +1,72 @@
 trigger:
-- master
+  - master
 
 resources:
-- repo: self
+  - repo: self
 
 variables:
-  CONTAINER_REGISTRY: 'espyacr'
+  CONTAINER_REGISTRY: 'espyacrtest'
   EVENTMANAGER_PORT: '6000'
   vmImageName: 'ubuntu-latest'
   IMAGE_TAG: '$(Build.BuildId)'
 
 stages:
-- stage: Build
-  displayName: Build stage
-  jobs:
-  - job: Build
-    displayName: Build and Push Container Images
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: Bash@3
-      displayName: Build container images for each service
-      inputs:
-        targetType: 'inline'
-        script: |
-          az login
-          export CONTAINER_REGISTRY=$(CONTAINER_REGISTRY)
-          export IMAGE_TAG=$(IMAGE_TAG)
-          echo 'Install ACR AAD credential helper and login'
-
-          curl -L https://aka.ms/acr/installaad/bash | /bin/bash
-          az acr login -n espyacr
-          docker login -u $(AZURE-REGISTRY-USERNAME) -p $(AZURE-REGISTRY-PASSWORD) $(CONTAINER_REGISTRY).azurecr.io
-
-          echo 'Start Build'
-
-          cd eventmanager
-          mvn compile jib:build
-
-          echo 'Build complete'
-
-    - publish: kubernetes
-      artifact: kubernetes
-
-- stage: Deploy
-  displayName: Deploy stage
-  dependsOn: Build
-
-  jobs:
-  - deployment: Deploy
-    displayName: Deploy to AKS
-    pool:
-      vmImage: $(vmImageName)
-    environment: 'Eventspy.default'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: replacetokens@3
-            displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
+  - stage: Build
+    displayName: Build stage
+    jobs:
+      - job: Build
+        displayName: Build and Push Container Images
+        pool:
+          vmImage: $(vmImageName)
+        steps:
+          - task: Bash@3
+            displayName: Build container images for each service
             inputs:
-              targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
-              tokenPrefix: '${'
-              tokenSuffix: '}'
+              targetType: 'inline'
+              script: |
+                az login
+                export CONTAINER_REGISTRY=$(CONTAINER_REGISTRY)
+                export IMAGE_TAG=$(IMAGE_TAG)
+                echo 'Install ACR AAD credential helper and login'
 
-          - task: KubernetesManifest@0
-            displayName: Deploy to Kubernetes cluster
-            inputs:
-              action: deploy
-              manifests: |
-                $(Pipeline.Workspace)/kubernetes/eventmanager.yaml
+                curl -L https://aka.ms/acr/installaad/bash | /bin/bash
+                az acr login -n espyacrtest
+                docker login -u $(AZURE-REGISTRY-USERNAME) -p $(AZURE-REGISTRY-PASSWORD) $(CONTAINER_REGISTRY).azurecr.io
+
+                echo 'Start Build'
+
+                cd gateway
+                mvn compile jib:build
+
+                echo 'Build complete'
+
+          - publish: kubernetes
+            artifact: kubernetes
+
+  - stage: Deploy
+    displayName: Deploy stage
+    dependsOn: Build
+
+    jobs:
+      - deployment: Deploy
+        displayName: Deploy to AKS
+        pool:
+          vmImage: $(vmImageName)
+        environment: 'Eventspy.default'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: replacetokens@3
+                  displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
+                  inputs:
+                    targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
+                    tokenPrefix: '${'
+                    tokenSuffix: '}'
+
+                - task: KubernetesManifest@0
+                  displayName: Deploy to Kubernetes cluster
+                  inputs:
+                    action: deploy
+                    manifests: |
+                      $(Pipeline.Workspace)/kubernetes/3-gateway.yaml
