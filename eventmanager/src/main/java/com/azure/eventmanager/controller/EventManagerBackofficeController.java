@@ -1,15 +1,10 @@
 package com.azure.eventmanager.controller;
 
+import static org.apache.logging.log4j.util.Strings.isBlank;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import com.azure.eventmanager.service.MlService;
-import com.azure.eventmanager.vo.EmailCommunication;
-import com.azure.identity.DefaultAzureCredentialBuilder;
-import com.azure.security.keyvault.secrets.SecretClient;
-import com.azure.security.keyvault.secrets.SecretClientBuilder;
-import com.azure.security.keyvault.secrets.models.KeyVaultSecret;
-import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,12 +17,12 @@ import org.springframework.web.servlet.ModelAndView;
 import com.azure.eventmanager.service.CommandMapper;
 import com.azure.eventmanager.service.CommunicationService;
 import com.azure.eventmanager.service.EventManagerService;
+import com.azure.eventmanager.service.MlService;
+import com.azure.eventmanager.vo.EmailCommunication;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-
-import static org.apache.logging.log4j.util.Strings.isBlank;
 
 @RequestMapping(value = "events")
 @Slf4j
@@ -40,7 +35,7 @@ public class EventManagerBackofficeController {
     private final CommunicationService communicationService;
     private final MlService mlService;
 
-//    @PreAuthorize("hasRole('users')")
+    @PreAuthorize("hasRole('users')")
     @PostMapping(value = "/register")
     public ModelAndView registerEvent(@Valid @ModelAttribute(EventSpy.Model.EVENT) RegisterEventRequest request,
                                       HttpServletRequest httpServletRequest) {
@@ -53,7 +48,7 @@ public class EventManagerBackofficeController {
         return new ModelAndView(String.format("redirect:events/%s/%s", request.getPlatform(), request.getOrganizer()));
     }
 
-//    @PreAuthorize("hasRole('users')")
+    @PreAuthorize("hasRole('users')")
     @GetMapping(value = "/register")
     public ModelAndView initRegisterEvent(HttpServletRequest httpServletRequest) {
         ModelAndView modelAndView = new ModelAndView(EventSpy.View.ADD_EVENT);
@@ -77,7 +72,7 @@ public class EventManagerBackofficeController {
         return modelAndView;
     }
 
-//    @PreAuthorize("hasRole('users')")
+    @PreAuthorize("hasRole('users')")
     @GetMapping(value = "/all")
     public ModelAndView showAllOrganizerEvents(HttpServletRequest request) {
         val username = request.getUserPrincipal().getName();
@@ -88,7 +83,7 @@ public class EventManagerBackofficeController {
         return modelAndView;
     }
 
-//    @PreAuthorize("hasRole('users')")
+    @PreAuthorize("hasRole('users')")
     @GetMapping(value = "/details/{code}")
     public ModelAndView getEventDetails(@PathVariable String code) {
         val event = eventManagerService.findByCode(code);
