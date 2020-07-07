@@ -42,7 +42,7 @@ spec:
         - name: gateway
           env:
             - name: CONFIG_SERVICE_PASSWORD
-          image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
+          image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-gateway:${IMAGE_TAG}
           ports:
             - containerPort: 4000
       restartPolicy: Always
