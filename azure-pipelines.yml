@@ -69,4 +69,4 @@ stages:
                   inputs:
                     action: deploy
                     manifests: |
-                      $(Pipeline.Workspace)/kubernetes/3-gateway.yaml
+                      $(Pipeline.Workspace)/kubernetes/gateway.yaml
