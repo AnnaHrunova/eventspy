@@ -35,7 +35,7 @@ stages:
 
                 echo 'Start Build'
 
-                cd gateway
+                cd eventmanager
                 mvn compile jib:build
 
                 echo 'Build complete'
