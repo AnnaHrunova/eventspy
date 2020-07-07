@@ -8,15 +8,16 @@ metadata:
     app: gateway
   name: gateway
 spec:
-  type: LoadBalancer
   ports:
-    - protocol: TCP
-      port: 80
+    - name: http
+      port: 4000
       targetPort: 4000
   selector:
     project: eventspy
     tier: frontend
     app: gateway
+status:
+  loadBalancer: {}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
