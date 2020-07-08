@@ -1,3 +1,7 @@
+# Build and Deploy piggymetrics to Azure Kubernetes Service
+# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
 trigger:
   - master
 
@@ -5,10 +9,11 @@ resources:
   - repo: self
 
 variables:
-  CONTAINER_REGISTRY: 'espyacrtest'
-  EVENTMANAGER_PORT: '6000'
+  CONTAINER_REGISTRY: 'espytest'
+  GATEWAY_PORT: '4000'
   vmImageName: 'ubuntu-latest'
   IMAGE_TAG: '$(Build.BuildId)'
+
 
 stages:
   - stage: Build
@@ -19,23 +24,23 @@ stages:
         pool:
           vmImage: $(vmImageName)
         steps:
+
           - task: Bash@3
             displayName: Build container images for each service
             inputs:
               targetType: 'inline'
               script: |
-                az login
                 export CONTAINER_REGISTRY=$(CONTAINER_REGISTRY)
                 export IMAGE_TAG=$(IMAGE_TAG)
                 echo 'Install ACR AAD credential helper and login'
 
                 curl -L https://aka.ms/acr/installaad/bash | /bin/bash
-                az acr login -n espyacrtest
+                az acr login -n $(CONTAINER_REGISTRY)
                 docker login -u $(AZURE-REGISTRY-USERNAME) -p $(AZURE-REGISTRY-PASSWORD) $(CONTAINER_REGISTRY).azurecr.io
 
                 echo 'Start Build'
 
-                cd gateway
+                cd ../gateway
                 mvn compile jib:build
 
                 echo 'Build complete'
@@ -57,6 +62,7 @@ stages:
           runOnce:
             deploy:
               steps:
+
                 - task: replacetokens@3
                   displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
                   inputs:
@@ -69,4 +75,4 @@ stages:
                   inputs:
                     action: deploy
                     manifests: |
-                      $(Pipeline.Workspace)/kubernetes/gateway.yaml
+                      $(Pipeline.Workspace)/kubernetes/3-gateway.yaml

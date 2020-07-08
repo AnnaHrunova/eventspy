@@ -8,16 +8,15 @@ metadata:
     app: gateway
   name: gateway
 spec:
+  type: LoadBalancer
   ports:
-    - name: http
-      port: 4000
-      targetPort: 4000
+  - name: http
+    port: 80
+    targetPort: 4000
   selector:
     project: eventspy
     tier: frontend
     app: gateway
-status:
-  loadBalancer: {}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -40,10 +39,10 @@ spec:
         app: gateway
     spec:
       containers:
-        - name: gateway
-          env:
-            - name: CONFIG_SERVICE_PASSWORD
-          image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-gateway:${IMAGE_TAG}
-          ports:
-            - containerPort: 4000
+      - name: gateway
+        env:
+        - name: CONFIG_SERVICE_PASSWORD
+        image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-gateway:${IMAGE_TAG}
+        ports:
+        - containerPort: 4000
       restartPolicy: Always
