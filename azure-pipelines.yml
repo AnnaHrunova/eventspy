@@ -9,8 +9,8 @@ resources:
   - repo: self
 
 variables:
-  CONTAINER_REGISTRY: 'espytest'
-  GATEWAY_PORT: '4000'
+  CONTAINER_REGISTRY: 'evspyacrtest'
+  CONFIG_PORT: '8888'
   vmImageName: 'ubuntu-latest'
   IMAGE_TAG: '$(Build.BuildId)'
 
@@ -40,8 +40,9 @@ stages:
 
                 echo 'Start Build'
 
-                cd ../gateway
-                mvn compile jib:build
+                cd config
+                mvn compile jib:build \
+                    -Djib.container.environment=CONFIG_SERVICE_PASSWORD=$(CONFIG-SERVICE-PASSWORD)
 
                 echo 'Build complete'
 
@@ -62,7 +63,6 @@ stages:
           runOnce:
             deploy:
               steps:
-
                 - task: replacetokens@3
                   displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
                   inputs:
@@ -75,4 +75,4 @@ stages:
                   inputs:
                     action: deploy
                     manifests: |
-                      $(Pipeline.Workspace)/kubernetes/3-gateway.yaml
+                      $(Pipeline.Workspace)/kubernetes/1-config.yaml
