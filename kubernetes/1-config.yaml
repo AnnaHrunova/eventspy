@@ -42,10 +42,6 @@ spec:
       containers:
       - env:
         - name: CONFIG_SERVICE_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: eventspy
-              key: config_service_password
         image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-config:${IMAGE_TAG}
         name: config
         ports:
