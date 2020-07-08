@@ -34,6 +34,7 @@ stages:
                 export IMAGE_TAG=$(IMAGE_TAG)
                 echo 'Install ACR AAD credential helper and login'
 
+                az login
                 curl -L https://aka.ms/acr/installaad/bash | /bin/bash
                 az acr login -n $(CONTAINER_REGISTRY)
                 docker login -u $(AZURE-REGISTRY-USERNAME) -p $(AZURE-REGISTRY-PASSWORD) $(CONTAINER_REGISTRY).azurecr.io
