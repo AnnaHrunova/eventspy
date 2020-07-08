@@ -28,6 +28,7 @@ stages:
           - task: Bash@3
             displayName: Build container images for each service
             inputs:
+              azureSubscription: 'servconn'
               targetType: 'inline'
               script: |
                 export CONTAINER_REGISTRY=$(CONTAINER_REGISTRY)
@@ -74,6 +75,7 @@ stages:
                 - task: KubernetesManifest@0
                   displayName: Deploy to Kubernetes cluster
                   inputs:
+                    azureSubscription: 'servconn'
                     action: deploy
                     manifests: |
                       $(Pipeline.Workspace)/kubernetes/1-config.yaml
