@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    project: eventspy
+    tier: middleware
+    app: eventmanager
+  name: eventmanager
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 9999
+    targetPort: 9999
+  selector:
+    project: eventspy
+    tier: middleware
+    app: eventmanager
+status:
+  loadBalancer: {}
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    project: eventspy
+    tier: middleware
+    app: eventmanager
+  name: eventmanager
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        project: eventspy
+        tier: middleware
+        app: eventmanager
+    spec:
+      containers:
+      - env:
+        - name: CONFIG_SERVICE_PASSWORD
+        image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
+        name: eventmanager
+        ports:
+        - containerPort: 9999
+        resources: {}
+      restartPolicy: Always
+status: {}

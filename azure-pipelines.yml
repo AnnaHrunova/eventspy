@@ -42,9 +42,8 @@ stages:
 
                 echo 'Start Build'
 
-                cd config
-                mvn compile jib:build \
-                    -Djib.container.environment=CONFIG_SERVICE_PASSWORD=$(CONFIG-SERVICE-PASSWORD)
+                cd eventmanager
+                mvn compile jib:build
 
                 echo 'Build complete'
 
@@ -78,4 +77,4 @@ stages:
                     azureSubscription: 'servconn'
                     action: deploy
                     manifests: |
-                      $(Pipeline.Workspace)/kubernetes/1-config.yaml
+                      $(Pipeline.Workspace)/kubernetes/2-eventmanager.yaml
