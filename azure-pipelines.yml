@@ -11,6 +11,7 @@ resources:
 variables:
   CONTAINER_REGISTRY: 'evspyacrtest'
   CONFIG_PORT: '8888'
+  EVENTMANAGER_PORT: '9999'
   vmImageName: 'ubuntu-latest'
   IMAGE_TAG: '$(Build.BuildId)'
 
