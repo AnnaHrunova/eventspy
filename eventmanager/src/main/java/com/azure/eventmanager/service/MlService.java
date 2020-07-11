@@ -21,22 +21,15 @@ public class MlService {
 
     // Handle making the request
     public void sendRequest(String data) {
-        // Replace with the scoring_uri of your service
-        String uri = "http://d7427ef8-5ab8-4068-8ec9-2039ef2f9752.northeurope.azurecontainer.io/score";
-        // If using authentication, replace with the auth key or token
-//        String key = "<your key or token>";
+        String uri = "http://ec6e5bea-f603-410b-9e6f-760f407b9696.northeurope.azurecontainer.io/score";
         try {
-            data = "{\"data\":[{\"instant\":1,\"date\":\"2021-01-01 00:00:00,000000\",\"season\":1,\"yr\":0,\"mnth\":1,\"weekday\":6,\"weathersit\":2,\"temp\":0.344167,\"atemp\":0.363625,\"hum\":0.805833,\"windspeed\":0.160446}]}";
+            data = "\"data\": [ { \"instant\": 1, \"date\": \"2018-01-01 00:00:00,000000\", \"season\": 1, \"yr\": 0, \"mnth\": 1, \"weekday\": 6, \"checkedin\": 50, \"skipped\": 10, \"declined\": 5, \"invalid\": 3 } ]";
             RequestEntity<String> requestEntity = RequestEntity .post(new URL(uri).toURI()) .contentType(MediaType.APPLICATION_JSON) .body(data);
             restTemplate.exchange(requestEntity, String.class);
             // Create the request
             Content content = Request.Post(uri)
                     .addHeader("Content-Type", "application/json")
-                    // Only needed if using authentication
-//                    .addHeader("Authorization", "Bearer " + key)
-                    // Set the JSON data as the body
                     .bodyString(data, ContentType.APPLICATION_JSON)
-                    // Make the request and display the response.
                     .execute().returnContent();
             System.out.println(content);
         }
