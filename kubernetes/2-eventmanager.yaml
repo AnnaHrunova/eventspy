@@ -10,7 +10,7 @@ metadata:
 spec:
   type: LoadBalancer
   ports:
-  - name: http
+  - name: https
     port: 9999
     targetPort: 9999
   selector:
