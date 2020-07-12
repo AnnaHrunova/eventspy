@@ -3,6 +3,8 @@
 <style th:replace="styles/styles.html :: design">
 </style>
 
+<body>
+<div><img th:src="@{/images/logo-2.png}"/></div>
 <form action="#" th:action="@{/events/register}" th:object="${event}" method="post">
   <table class="darkTable" style="width: 70%">
     <thead>    </thead>
@@ -61,7 +63,7 @@
         <label for="eventStart">Event Start</label>
       </td>
       <td>
-        <input type="datetime-local" th:field="*{eventStart}" id="eventStart">
+        <input type="text" th:field="*{eventStart}" id="eventStart">
         <span th:if="${#fields.hasErrors('eventStart')}" th:errors="*{eventStart}"></span>
       </td>
     </tr>
@@ -71,7 +73,7 @@
         <label for="eventEnd">Event End</label>
       </td>
       <td>
-        <input type="datetime-local" th:field="*{eventEnd}" id="eventEnd">
+        <input type="text" th:field="*{eventEnd}" id="eventEnd">
         <span th:if="${#fields.hasErrors('eventEnd')}" th:errors="*{eventEnd}"></span>
       </td>
     </tr>
@@ -89,3 +91,4 @@
 
   <input type="submit" value="Save">
 </form>
+</body>

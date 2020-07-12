@@ -21,9 +21,9 @@ public class MlService {
 
     // Handle making the request
     public void sendRequest(String data) {
-        String uri = "http://ec6e5bea-f603-410b-9e6f-760f407b9696.northeurope.azurecontainer.io/score";
+        String uri = "http://a8edc0b9-25ab-4359-a784-fb1754222eab.northeurope.azurecontainer.io/score";
         try {
-            data = "\"data\": [ { \"instant\": 1, \"date\": \"2018-01-01 00:00:00,000000\", \"season\": 1, \"yr\": 0, \"mnth\": 1, \"weekday\": 6, \"checkedin\": 50, \"skipped\": 10, \"declined\": 5, \"invalid\": 3 } ]";
+            data = "{\"data\": [ { \"instant\": 1, \"date\": \"2021-01-01 00:00:00,000000\", \"season\": 1, \"yr\": 0, \"mnth\": 1, \"weekday\": 6, \"checkedin\": 50, \"skipped\": 10, \"declined\": 5, \"invalid\": 3 } ]}";
             RequestEntity<String> requestEntity = RequestEntity .post(new URL(uri).toURI()) .contentType(MediaType.APPLICATION_JSON) .body(data);
             restTemplate.exchange(requestEntity, String.class);
             // Create the request

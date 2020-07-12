@@ -18,8 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @RestController(value = "test")
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 @AllArgsConstructor
 public class TestController {
@@ -61,7 +60,7 @@ public class TestController {
     }
 
     @GetMapping(value = "/{applicationReference}/check-in-test")
-    public ResponseEntity<String> testCheckIn(@PathVariable String applicationReference) {
+    public ResponseEntity<String> testCheckIn(@PathVariable String applicationReference) throws Exception {
         val command = CheckInCommand.builder()
                 .applicationReference(applicationReference)
                 .position(new Coordinates(new BigDecimal("12.5"), new BigDecimal("55.7")))
@@ -75,18 +74,6 @@ public class TestController {
     @GetMapping(value = "/{applicationReference}/decline-test")
     public ResponseEntity<String> testDecline(@PathVariable String applicationReference) {
         memberService.declineApplication(applicationReference);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping(value = "/{memberReference}/details-test")
-    public ResponseEntity<MemberEntity> testGetMemberDetails(@PathVariable String memberReference) {
-        val member = memberService.getMemberDetails(memberReference);
-        return ResponseEntity.ok(member);
-    }
-
-    @PostMapping(value = "/register-organizer-test")
-    public ResponseEntity<Void> testRegisterOrganizer(@RequestBody RegisterOrganizerRequest request) {
-        eventManagerService.saveOrUpdateOrganizerName(request.getOrganizerUsername(), request.getOrganizerName());
         return ResponseEntity.ok().build();
     }
 }

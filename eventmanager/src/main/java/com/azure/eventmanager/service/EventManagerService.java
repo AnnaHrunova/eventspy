@@ -4,13 +4,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.azure.eventmanager.domain.OrganizationEntity;
+import com.azure.eventmanager.domain.*;
+import com.azure.eventmanager.events.ApplicationCheckedInEvent;
+import com.azure.eventmanager.events.ApplicationInvalidPositionEvent;
 import com.azure.eventmanager.repository.OrganizationRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import com.azure.eventmanager.domain.ApplicationEntity;
-import com.azure.eventmanager.domain.EventEntity;
-import com.azure.eventmanager.domain.Status;
 import com.azure.eventmanager.events.ApplicationSkippedEvent;
 import com.azure.eventmanager.maps.AzureMapsService;
 import com.azure.eventmanager.repository.ApplicationRepository;
@@ -33,6 +33,7 @@ public class EventManagerService {
     private final AzureMapsService azureMapsService;
     private final EntityMapper entityMapper;
     private final CommunicationService communicationService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     public String getOrganizerName(String username) {
         return organizationRepository.findFirstByOrganizerUsername(username)
@@ -66,6 +67,14 @@ public class EventManagerService {
                 .collect(Collectors.toList());
     }
 
+    public void changeApplicationStatus(String applicationReference, Status status) {
+        applicationRepository.findFirstByApplicationReference(applicationReference)
+                .ifPresent(application -> {
+                    application.setStatus(status);
+                    applicationRepository.save(application);
+                });
+    }
+
     public Event findByCode(final String code) {
         return eventRepository.findFirstByCode(code)
                 .map(entityMapper::map)
@@ -87,6 +96,29 @@ public class EventManagerService {
     public void sendCheckInLinks() {
         applicationRepository.findAllByStatusInAndEventStartBefore(Status.getActiveStatuses(), LocalDateTime.now().plusHours(1))
                 .forEach(this::sendLink);
+    }
+
+    public void checkPosition(String applicationReference, Coordinates position) {
+        val application = applicationRepository.findFirstByApplicationReference(applicationReference)
+                .orElseThrow(() -> new RuntimeException(String.format("Application %s not found", applicationReference)));
+        val eventCoordinates = application.getEvent().getCoordinates();
+        if (eventCoordinates.getLon().equals(position.getLon()) && eventCoordinates.getLat().equals(position.getLat())) {
+            val checkInEvent = new ApplicationCheckedInEvent();
+            checkInEvent.setApplicationReference(application.getApplicationReference());
+            checkInEvent.setEmail(application.getContactData().getEmail());
+            checkInEvent.setPhone(application.getContactData().getMobilePhone());
+            checkInEvent.setMemberReference(application.getMember().getMemberReference());
+            changeApplicationStatus(applicationReference, Status.CHECKED_IN);
+            applicationEventPublisher.publishEvent(checkInEvent);
+        } else {
+            val invalidPositionEvent = new ApplicationInvalidPositionEvent();
+            invalidPositionEvent.setApplicationReference(application.getApplicationReference());
+            invalidPositionEvent.setEmail(application.getContactData().getEmail());
+            invalidPositionEvent.setPhone(application.getContactData().getMobilePhone());
+            invalidPositionEvent.setMemberReference(application.getMember().getMemberReference());
+            changeApplicationStatus(applicationReference, Status.INVALID_POSITION);
+            applicationEventPublisher.publishEvent(invalidPositionEvent);
+        }
     }
 
     private void publishApplicationSkippedEvent(ApplicationEntity applicationEntity) {

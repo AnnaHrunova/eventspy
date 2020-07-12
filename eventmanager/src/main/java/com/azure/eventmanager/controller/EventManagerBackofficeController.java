@@ -5,6 +5,8 @@ import static org.apache.logging.log4j.util.Strings.isBlank;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import com.azure.eventmanager.service.*;
+import com.azure.eventmanager.vo.CheckInMessage;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.azure.eventmanager.service.CommandMapper;
-import com.azure.eventmanager.service.CommunicationService;
-import com.azure.eventmanager.service.EventManagerService;
-import com.azure.eventmanager.service.MlService;
 import com.azure.eventmanager.vo.EmailCommunication;
 
 import lombok.AllArgsConstructor;
@@ -34,6 +32,7 @@ public class EventManagerBackofficeController {
     private final CommandMapper mapper;
     private final CommunicationService communicationService;
     private final MlService mlService;
+    private final CoordinatesMessagesPublisher publisher;
 
     @PreAuthorize("hasRole('users')")
     @PostMapping(value = "/register")
@@ -45,12 +44,12 @@ public class EventManagerBackofficeController {
         command.setOrganizerUsername(username);
         command.setOrganizer(organizer);
         eventManagerService.registerEvent(command);
-        return new ModelAndView(String.format("redirect:events/%s/%s", request.getPlatform(), request.getOrganizer()));
+        return new ModelAndView(String.format("redirect:%s/%s", request.getPlatform(), request.getOrganizer()));
     }
 
     @PreAuthorize("hasRole('users')")
     @GetMapping(value = "/register")
-    public ModelAndView initRegisterEvent(HttpServletRequest httpServletRequest) {
+    public ModelAndView initRegisterEvent(HttpServletRequest httpServletRequest) throws Exception {
         ModelAndView modelAndView = new ModelAndView(EventSpy.View.ADD_EVENT);
         val username = httpServletRequest.getUserPrincipal().getName();
         String organizer = eventManagerService.getOrganizerName(username);
@@ -77,7 +76,7 @@ public class EventManagerBackofficeController {
     public ModelAndView showAllOrganizerEvents(HttpServletRequest request) {
         val username = request.getUserPrincipal().getName();
         val events = eventManagerService.findEvents(username);
-        mlService.sendRequest();
+//        mlService.sendRequest();
         final ModelAndView modelAndView = new ModelAndView(EventSpy.View.EVENTS);
         modelAndView.addObject(EventSpy.Model.EVENTS, events);
         return modelAndView;

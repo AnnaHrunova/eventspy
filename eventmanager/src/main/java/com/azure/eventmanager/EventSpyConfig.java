@@ -1,7 +1,13 @@
 package com.azure.eventmanager;
 
+import com.azure.eventmanager.service.CoordinatesMessageListener;
+import com.azure.eventmanager.service.EventManagerService;
 import com.azure.eventmanager.service.MlService;
 import com.microsoft.azure.eventgrid.TopicCredentials;
+import com.microsoft.azure.servicebus.QueueClient;
+import com.microsoft.azure.servicebus.ReceiveMode;
+import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
+import com.microsoft.azure.servicebus.primitives.ServiceBusException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -46,6 +52,18 @@ public class EventSpyConfig {
     @Bean
     public TopicCredentials topicCredentials(@Value("${eventGridKey}") String eventGridKey) {
         return new TopicCredentials(eventGridKey);
+    }
+
+    @Bean
+    public CoordinatesMessageListener coordinatesMessageListener(EventManagerService eventManagerService) {
+        return new CoordinatesMessageListener(eventManagerService);
+    }
+
+    @Bean
+    public QueueClient queue(EventManagerService eventManagerService) throws ServiceBusException, InterruptedException {
+        QueueClient queueClient = new QueueClient(new ConnectionStringBuilder("Endpoint=sb://evspyq.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=jg8z5qNnOLO9DeeSi5JZpzE3q3xJJntKMHOuNRC1P4Y=", "coordinates"), ReceiveMode.PEEKLOCK);
+        queueClient.registerMessageHandler(coordinatesMessageListener(eventManagerService));
+        return queueClient;
     }
 
     private ClientHttpRequestFactory requestFactory() {

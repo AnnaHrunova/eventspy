@@ -1,7 +1,11 @@
 package com.azure.eventmanager.service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
+import com.azure.eventmanager.controller.MemberStatisticsResponse;
+import com.azure.eventmanager.events.ApplicationDeclinedEvent;
+import com.azure.eventmanager.vo.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +23,6 @@ import com.azure.eventmanager.events.ApplyEvent;
 import com.azure.eventmanager.repository.ApplicationRepository;
 import com.azure.eventmanager.repository.EventRepository;
 import com.azure.eventmanager.repository.MemberRepository;
-import com.azure.eventmanager.vo.ApplyCommand;
-import com.azure.eventmanager.vo.CheckInCommand;
-import com.azure.eventmanager.vo.ContactDetails;
-import com.azure.eventmanager.vo.DeclineCommand;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -36,6 +36,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final ApplicationRepository applicationRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final CoordinatesMessagesPublisher coordinatesPublisher;
 
     public String applyForEvent(ApplyCommand command) {
         EventEntity event = eventRepository.findFirstByCode(command.getEventCode())
@@ -50,6 +51,7 @@ public class MemberService {
                 .member(member)
                 .status(Status.CREATED)
                 .contactData(createContactData(command.getContactDetails()))
+                .applicationReference(UUID.randomUUID().toString())
                 .build();
         application = applicationRepository.save(application);
         event.reserveSpot();
@@ -64,18 +66,23 @@ public class MemberService {
         return application.getApplicationReference();
     }
 
-    public void checkIn(CheckInCommand command) {
+    public void checkIn(CheckInCommand command) throws Exception {
         ApplicationEntity application = applicationRepository.findFirstByApplicationReference(command.getApplicationReference())
                 .orElseThrow(() -> new RuntimeException(String.format("Application %s not found", command.getApplicationReference())));
-        checkTimeAndState(application);
-        checkPosition(application, command.getPosition());
+//        checkTimeAndState(application);
+
+        val message = new CheckInMessage();
+        message.setApplicationReference(command.getApplicationReference());
+        message.setLon(String.valueOf(command.getPosition().getLon()));
+        message.setLat(String.valueOf(command.getPosition().getLat()));
+        coordinatesPublisher.publish("coordinates", message);
     }
 
     public void declineApplication(String applicationReference) {
         ApplicationEntity application = applicationRepository.findFirstByApplicationReference(applicationReference)
                 .orElseThrow(() -> new RuntimeException(String.format("Application %s not found", applicationReference)));
 
-        val declineEvent = new ApplicationInvalidPositionEvent();
+        val declineEvent = new ApplicationDeclinedEvent();
         declineEvent.setApplicationReference(application.getApplicationReference());
         declineEvent.setEmail(application.getContactData().getEmail());
         declineEvent.setPhone(application.getContactData().getMobilePhone());
@@ -87,9 +94,25 @@ public class MemberService {
         applicationRepository.save(application);
     }
 
-    public MemberEntity getMemberDetails(String memberReference) {
-        return memberRepository.findFirstByMemberReference(memberReference)
+    public MemberStatisticsResponse getMemberDetails(String memberReference) {
+        val member = memberRepository.findFirstByMemberReference(memberReference)
                 .orElseThrow(() -> new RuntimeException(String.format("Member %s not found", memberReference)));
+        val response = new MemberStatisticsResponse();
+        response.setMemberId(memberReference);
+        response.setMemberRate(member.getStatistics().getRate());
+        response.setCheckedInCount(member.getStatistics().getCheckInCount());
+        response.setDeclinedCount(member.getStatistics().getDeclineCount());
+        response.setSkippedCount(member.getStatistics().getSkipCount());
+        response.setInvalidPositionCount(member.getStatistics().getInvalidPositionCount());
+        response.setApplicationsCount(member.getStatistics().getApplicationsCount());
+        return response;
+    }
+
+    public ContactDetails getMemberContactDetails(String memberReference) {
+        val member = memberRepository.findFirstByMemberReference(memberReference)
+                .orElseThrow(() -> new RuntimeException(String.format("Member %s not found", memberReference)));
+
+        return new ContactDetails(member.getContactData().getEmail(), member.getContactData().getMobilePhone());
     }
 
     private void checkTimeAndState(ApplicationEntity application) {
@@ -100,28 +123,6 @@ public class MemberService {
         if (currentTime.isBefore(application.getEvent().getStart()) || currentTime.isAfter(application.getEvent().getEnd())) {
             throw new RuntimeException(String.format("CheckIn is not allowed for application: %s because of incorrect time frame", application.getApplicationReference()));
         }
-    }
-
-    private void checkPosition(ApplicationEntity application, Coordinates position) {
-        val eventCoordinates = application.getEvent().getCoordinates();
-        if (eventCoordinates.getLon().equals(position.getLon()) && eventCoordinates.getLat().equals(position.getLat())) {
-            val checkInEvent = new ApplicationCheckedInEvent();
-            checkInEvent.setApplicationReference(application.getApplicationReference());
-            checkInEvent.setEmail(application.getContactData().getEmail());
-            checkInEvent.setPhone(application.getContactData().getMobilePhone());
-            checkInEvent.setMemberReference(application.getMember().getMemberReference());
-            application.setStatus(Status.CHECKED_IN);
-            applicationEventPublisher.publishEvent(checkInEvent);
-        } else {
-            val invalidPositionEvent = new ApplicationInvalidPositionEvent();
-            invalidPositionEvent.setApplicationReference(application.getApplicationReference());
-            invalidPositionEvent.setEmail(application.getContactData().getEmail());
-            invalidPositionEvent.setPhone(application.getContactData().getMobilePhone());
-            invalidPositionEvent.setMemberReference(application.getMember().getMemberReference());
-            application.setStatus(Status.INVALID_POSITION);
-            applicationEventPublisher.publishEvent(invalidPositionEvent);
-        }
-        applicationRepository.save(application);
     }
 
     private ContactData createContactData(final ContactDetails contactDetails) {

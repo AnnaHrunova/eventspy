@@ -62,13 +62,16 @@ public class Statistics {
     }
 
     private BigDecimal recalculateRate() {
-        BigDecimal skipCountCoef = BigDecimal.valueOf(-1.0);
-        BigDecimal declineCountCoef = BigDecimal.valueOf(-0.3);
-        BigDecimal checkedIdCoef = BigDecimal.ONE;
         int totalApplications = checkInCount + declineCount + skipCount + invalidPositionCount;
-        return (checkedIdCoef.multiply(new BigDecimal(checkInCount))
-                .add(declineCountCoef.multiply(new BigDecimal(declineCount)))
-                .add(skipCountCoef.multiply(new BigDecimal(skipCount + invalidPositionCount))))
-                .divide(new BigDecimal(totalApplications), RoundingMode.HALF_UP);
+        if (totalApplications > 0) {
+            BigDecimal skipCountCoef = BigDecimal.valueOf(-1.0);
+            BigDecimal declineCountCoef = BigDecimal.valueOf(-0.3);
+            BigDecimal checkedIdCoef = BigDecimal.ONE;
+            return (checkedIdCoef.multiply(new BigDecimal(checkInCount))
+                    .add(declineCountCoef.multiply(new BigDecimal(declineCount)))
+                    .add(skipCountCoef.multiply(new BigDecimal(skipCount + invalidPositionCount))))
+                    .divide(new BigDecimal(totalApplications), RoundingMode.HALF_UP);
+        }
+        return rate;
     }
 }

@@ -1,15 +1,11 @@
 package com.azure.eventmanager.controller;
 
-import com.azure.eventmanager.service.CommunicationService;
-import com.azure.eventmanager.service.EventManagerService;
+import com.azure.eventmanager.service.*;
 import com.azure.eventmanager.vo.EmailCommunication;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import com.azure.eventmanager.service.CommandMapper;
-import com.azure.eventmanager.service.MemberService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,9 +15,8 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-@RestController(value = "api")
-@RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE,
-        consumes = MediaType.APPLICATION_JSON_VALUE)
+@RestController
+@RequestMapping(value = "api", produces = MediaType.APPLICATION_JSON_VALUE)
 @Slf4j
 @AllArgsConstructor
 public class EventManagerApiController {
@@ -30,8 +25,9 @@ public class EventManagerApiController {
     private final EventManagerService eventManagerService;
     private final CommunicationService communicationService;
     private final CommandMapper mapper;
+    private final StatisticsService statisticsService;
 
-    @PostMapping(value = "/apply")
+    @PostMapping(value = "/apply", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> apply(@RequestBody ApplyRequest request) {
         val command = mapper.map(request);
         val applicationReference = memberService.applyForEvent(command);
@@ -48,9 +44,9 @@ public class EventManagerApiController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/{applicationReference}/check-in")
+    @PostMapping(value = "/{applicationReference}/check-in", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> checkIn(@PathVariable String applicationReference,
-                                          @RequestBody CheckInRequest request) {
+                                          @RequestBody CheckInRequest request) throws Exception {
         val command = mapper.map(request);
         command.setApplicationReference(applicationReference);
         memberService.checkIn(command);
@@ -63,9 +59,19 @@ public class EventManagerApiController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping(value = "/register-organizer")
+    @PostMapping(value = "/register-organizer", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> registerOrganizer(@RequestBody RegisterOrganizerRequest request) {
         eventManagerService.saveOrUpdateOrganizerName(request.getOrganizerUsername(), request.getOrganizerName());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/member-statistics/{memberId}")
+    public ResponseEntity<MemberStatisticsResponse> getUserStatistics(@PathVariable String memberId) {
+        val contactDetails = memberService.getMemberContactDetails(memberId);
+        val response = memberService.getMemberDetails(memberId);
+
+        response.setRateByEmail(statisticsService.getEmailStatistics(contactDetails.getEmail()).getStatistics().getRate());
+        response.setRateByPhone(statisticsService.getPhoneStatistics(contactDetails.getMobilePhone()).getStatistics().getRate());
+        return ResponseEntity.ok(response);
     }
 }

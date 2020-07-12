@@ -22,77 +22,78 @@ public class StatisticsService {
     private final PhoneStatisticsRepository phoneStatisticsRepository;
     private final MemberRepository memberRepository;
 
-    public EmailStatisticsEntity updateEmailStatisticsOnApply(String email) {
-        val emailStatistics =  emailStatisticsRepository.findFirstByEmail(email)
+    public EmailStatisticsEntity getEmailStatistics(String email) {
+        return emailStatisticsRepository.findFirstByEmail(email)
                 .orElse(createNewEmailStatistics(email));
+    }
+
+    public PhoneStatisticsEntity getPhoneStatistics(String phone) {
+        return phoneStatisticsRepository.findFirstByPhoneNumber(phone)
+                .orElse(createNewPhoneStatistics(phone));
+    }
+
+    public EmailStatisticsEntity updateEmailStatisticsOnApply(String email) {
+        val emailStatistics = getEmailStatistics(email);
         emailStatistics.getStatistics().increaseApplicationsCount();
         return emailStatisticsRepository.save(emailStatistics);
     }
 
+
     public PhoneStatisticsEntity updatePhoneStatisticsOnApply(String phone) {
 
-        val phoneStatistics =  phoneStatisticsRepository.findFirstByPhoneNumber(phone)
-                .orElse(createNewPhoneStatistics(phone));
+        val phoneStatistics = getPhoneStatistics(phone);
         phoneStatistics.getStatistics().increaseApplicationsCount();
         return phoneStatisticsRepository.save(phoneStatistics);
     }
 
     public EmailStatisticsEntity updateEmailStatisticsOnCheckIn(String email) {
-        val emailStatistics = emailStatisticsRepository.findFirstByEmail(email)
-                .orElse(createNewEmailStatistics(email));
+        val emailStatistics = getEmailStatistics(email);
         emailStatistics.getStatistics().increaseCheckInCount();
         return emailStatisticsRepository.save(emailStatistics);
     }
 
     public PhoneStatisticsEntity updatePhoneStatisticsOnCheckIn(String phone) {
 
-        val phoneStatistics =  phoneStatisticsRepository.findFirstByPhoneNumber(phone)
-                .orElse(createNewPhoneStatistics(phone));
+        val phoneStatistics = getPhoneStatistics(phone);
         phoneStatistics.getStatistics().increaseCheckInCount();
         return phoneStatisticsRepository.save(phoneStatistics);
     }
 
     public EmailStatisticsEntity updateEmailStatisticsOnDecline(String email) {
-        val emailStatistics = emailStatisticsRepository.findFirstByEmail(email)
-                .orElse(createNewEmailStatistics(email));
+        val emailStatistics = getEmailStatistics(email);
         emailStatistics.getStatistics().increaseDeclineCount();
         return emailStatisticsRepository.save(emailStatistics);
     }
 
     public PhoneStatisticsEntity updatePhoneStatisticsOnDecline(String phone) {
 
-        val phoneStatistics =  phoneStatisticsRepository.findFirstByPhoneNumber(phone)
-                .orElse(createNewPhoneStatistics(phone));
+        val phoneStatistics = getPhoneStatistics(phone);
         phoneStatistics.getStatistics().increaseDeclineCount();
         return phoneStatisticsRepository.save(phoneStatistics);
     }
 
     public EmailStatisticsEntity updateEmailStatisticsOnSkip(String email) {
-        val emailStatistics = emailStatisticsRepository.findFirstByEmail(email)
-                .orElse(createNewEmailStatistics(email));
+        val emailStatistics = getEmailStatistics(email);
         emailStatistics.getStatistics().increaseSkipCount();
         return emailStatisticsRepository.save(emailStatistics);
     }
 
     public PhoneStatisticsEntity updatePhoneStatisticsOnSkip(String phone) {
 
-        val phoneStatistics =  phoneStatisticsRepository.findFirstByPhoneNumber(phone)
-                .orElse(createNewPhoneStatistics(phone));
+        val phoneStatistics = getPhoneStatistics(phone);
         phoneStatistics.getStatistics().increaseSkipCount();
         return phoneStatisticsRepository.save(phoneStatistics);
     }
 
     public EmailStatisticsEntity updateEmailStatisticsOnInvalidPosition(String email) {
-        val emailStatistics = emailStatisticsRepository.findFirstByEmail(email)
-                .orElse(createNewEmailStatistics(email));
+        val emailStatistics = getEmailStatistics(email);
         emailStatistics.getStatistics().increaseInvalidPositionCount();
         return emailStatisticsRepository.save(emailStatistics);
     }
 
     public PhoneStatisticsEntity updatePhoneStatisticsOnInvalidPosition(String phone) {
 
-        val phoneStatistics =  phoneStatisticsRepository.findFirstByPhoneNumber(phone)
-                .orElse(createNewPhoneStatistics(phone));
+        val phoneStatistics = getPhoneStatistics(phone);
         phoneStatistics.getStatistics().increaseInvalidPositionCount();
         return phoneStatisticsRepository.save(phoneStatistics);
     }
