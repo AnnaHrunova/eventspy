@@ -43,12 +43,26 @@ spec:
         app: eventmanager
     spec:
       containers:
-      - env:
-        - name: CONFIG_SERVICE_PASSWORD
-        image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
-        name: eventmanager
-        ports:
-        - containerPort: 9999
-        resources: {}
-      restartPolicy: Always
+        - env:
+          - name: KV_CLIENT_ID
+            valueFrom:
+              secretKeyRef:
+                name: evspykv
+                key: kv_client_id
+          - name: KV_CLIENT_KEY
+            valueFrom:
+              secretKeyRef:
+                name: evspykv
+                key: kv_client_key
+          - name: KV_TENANT_ID
+            valueFrom:
+              secretKeyRef:
+                name: evspykv
+                key: kv_tenant_id
+          image: ${CONTAINER_REGISTRY}.azurecr.io/eventspy-eventmanager:${IMAGE_TAG}
+          name: eventmanager
+          ports:
+            - containerPort: 9999
+          resources: {}
+        restartPolicy: Always
 status: {}
