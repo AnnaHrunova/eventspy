@@ -20,6 +20,7 @@ public class StatisticsActionEventListener {
         statisticsService.updateEmailStatisticsOnSkip(event.getEmail());
         statisticsService.updatePhoneStatisticsOnSkip(event.getPhone());
         statisticsService.updateMemberStatisticsOnSkip(event.getMemberReference());
+        statisticsService.updateTotalStatisticsOnSkip();
     }
 
     @EventListener
@@ -27,6 +28,7 @@ public class StatisticsActionEventListener {
         statisticsService.updateEmailStatisticsOnCheckIn(event.getEmail());
         statisticsService.updatePhoneStatisticsOnCheckIn(event.getPhone());
         statisticsService.updateMemberStatisticsOnCheckIn(event.getMemberReference());
+        statisticsService.updateTotalStatisticsOnCheckIn();
     }
 
     @EventListener
@@ -34,6 +36,7 @@ public class StatisticsActionEventListener {
         statisticsService.updateEmailStatisticsOnDecline(event.getEmail());
         statisticsService.updatePhoneStatisticsOnDecline(event.getPhone());
         statisticsService.updateMemberStatisticsOnDecline(event.getMemberReference());
+        statisticsService.updateTotalStatisticsOnDecline();
     }
 
     @EventListener
@@ -41,6 +44,7 @@ public class StatisticsActionEventListener {
         statisticsService.updateEmailStatisticsOnInvalidPosition(event.getEmail());
         statisticsService.updatePhoneStatisticsOnInvalidPosition(event.getPhone());
         statisticsService.updateMemberStatisticsOnInvalidPosition(event.getMemberReference());
+        statisticsService.updateTotalStatisticsOnInvalidPosition();
     }
 
     @EventListener
@@ -48,5 +52,6 @@ public class StatisticsActionEventListener {
         statisticsService.updateEmailStatisticsOnApply(event.getEmail());
         statisticsService.updatePhoneStatisticsOnApply(event.getPhone());
         statisticsService.updateMemberStatisticsOnApply(event.getMemberReference());
+        statisticsService.updateTotalStatisticsOnApply();
     }
 }

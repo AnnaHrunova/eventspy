@@ -13,7 +13,6 @@ public class Event {
     private String name;
     private String code;
     private String organizer;
-    private String platform;
     private String organizerUsername;
     private String address;
     private String coordinates;

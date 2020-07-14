@@ -15,7 +15,6 @@ public class EventEntity {
     private String id;
     private String code;
     private String organizer;
-    private String organizerUsername;
     private String platform;
     private String name;
 

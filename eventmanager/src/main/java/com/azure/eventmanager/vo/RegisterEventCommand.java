@@ -11,7 +11,6 @@ import lombok.Data;
 public class RegisterEventCommand {
     private String name;
     private String organizer;
-    private String organizerUsername;
     private String platform;
     private String address;
     private LocalDateTime eventStart;

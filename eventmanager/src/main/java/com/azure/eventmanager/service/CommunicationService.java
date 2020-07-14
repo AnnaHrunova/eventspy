@@ -1,59 +1,48 @@
 package com.azure.eventmanager.service;
 
-import com.azure.eventmanager.vo.EmailCommunication;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.microsoft.azure.eventgrid.EventGridClient;
-import com.microsoft.azure.eventgrid.TopicCredentials;
-import com.microsoft.azure.eventgrid.implementation.EventGridClientImpl;
-import com.microsoft.azure.eventgrid.models.EventGridEvent;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.azure.eventmanager.vo.EmailCommunication;
+import com.microsoft.azure.eventgrid.TopicCredentials;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class CommunicationService {
 
+    private final CommunicationSender communicationSender;
+
     private final TopicCredentials topicCredentials;
 
     @Value("${eventGridEndpoint}")
     private String eventGridEndpoint;
 
-    public void sendEmail(final EmailCommunication event) {
-        try {
-            EventGridClient client = new EventGridClientImpl(topicCredentials);
+    public void sendApplicationConfirmationEmail(final String email,
+                                                 final String eventCode) {
+        EmailCommunication communication = new EmailCommunication();
+        communication.setTo("anna.hrunova93@gmail.com");
+        communication.setSubject("Thank You For Application");
+        communication.setContent(String.format("You have just applied for the event: %s.", 123) +
+                String.format("To decline your application, please follow the link: %s", 123));
+        communication.setType("application.link");
+        communicationSender.sendEmail(communication);
+    }
 
-            log.info("Publishing email event to EventGrid");
-            Personalizations personalizations = new Personalizations(event.getTo(), event.getSubject(), event.getContent());
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.registerModule(new JodaModule());
-            List<EventGridEvent> eventsList = new ArrayList<>();
-            eventsList.add(new EventGridEvent(
-                    UUID.randomUUID().toString(),
-                    "Subj1",
-                    mapper.writeValueAsString(personalizations),
-                    event.getType(),
-                    DateTime.now(),
-                    "1.0"
-            ));
+    public void sendCheckInLink(final String email,
+                                final String applicationReference) {
+        EmailCommunication communication = new EmailCommunication();
 
-            String host = new URI(eventGridEndpoint).getHost();
-            String eventGridEndpoint = String.format("https://%s/", host);
-
-            client.publishEvents(eventGridEndpoint, eventsList);
-        } catch (Exception e) {
-            log.error(e.getMessage());
-        }
+        val checkInLink = String.format("http://localhost:8080/%s/check-in", applicationReference);
+        communication.setTo("anna.hrunova93@gmail.com");
+        communication.setSubject("Check in!");
+        communication.setContent(String.format("Please, follow the link: %s to check-in", checkInLink));
+        communication.setType("checkin.link");
+        communicationSender.sendEmail(communication);
     }
 
 

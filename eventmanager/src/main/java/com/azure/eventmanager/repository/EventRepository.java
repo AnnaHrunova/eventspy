@@ -11,5 +11,5 @@ public interface EventRepository extends MongoRepository <EventEntity, String> {
 
     Optional<EventEntity> findFirstByCode(String code);
 
-    List<EventEntity> findAllByOrganizerUsername(String organizerUsername);
+    List<EventEntity> findAllByOrganizer(String organizer);
 }

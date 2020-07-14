@@ -3,26 +3,26 @@ package com.azure.eventmanager.service;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-import com.azure.eventmanager.controller.MemberStatisticsResponse;
-import com.azure.eventmanager.events.ApplicationDeclinedEvent;
-import com.azure.eventmanager.vo.*;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.azure.eventmanager.controller.MemberStatisticsResponse;
 import com.azure.eventmanager.domain.ApplicationEntity;
 import com.azure.eventmanager.domain.ContactData;
-import com.azure.eventmanager.domain.Coordinates;
 import com.azure.eventmanager.domain.EventEntity;
 import com.azure.eventmanager.domain.MemberEntity;
 import com.azure.eventmanager.domain.Statistics;
 import com.azure.eventmanager.domain.Status;
-import com.azure.eventmanager.events.ApplicationCheckedInEvent;
-import com.azure.eventmanager.events.ApplicationInvalidPositionEvent;
+import com.azure.eventmanager.events.ApplicationDeclinedEvent;
 import com.azure.eventmanager.events.ApplyEvent;
 import com.azure.eventmanager.repository.ApplicationRepository;
 import com.azure.eventmanager.repository.EventRepository;
 import com.azure.eventmanager.repository.MemberRepository;
+import com.azure.eventmanager.vo.ApplyCommand;
+import com.azure.eventmanager.vo.CheckInCommand;
+import com.azure.eventmanager.vo.CheckInMessage;
+import com.azure.eventmanager.vo.ContactDetails;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -43,7 +43,6 @@ public class MemberService {
                 .orElseThrow(() -> new RuntimeException(String.format("Event with code %s not found", command.getEventCode())));
 
         MemberEntity member = memberRepository.findFirstByMemberReference(command.getMemberReference())
-                .map(m -> updateContactDetails(m, command.getContactDetails()))
                 .orElse(createNewMember(command));
         member = memberRepository.save(member);
         ApplicationEntity application = ApplicationEntity.builder()
@@ -108,13 +107,6 @@ public class MemberService {
         return response;
     }
 
-    public ContactDetails getMemberContactDetails(String memberReference) {
-        val member = memberRepository.findFirstByMemberReference(memberReference)
-                .orElseThrow(() -> new RuntimeException(String.format("Member %s not found", memberReference)));
-
-        return new ContactDetails(member.getContactData().getEmail(), member.getContactData().getMobilePhone());
-    }
-
     private void checkTimeAndState(ApplicationEntity application) {
         val currentTime = LocalDateTime.now();
         if (!Status.getStatusesAllowedForCheckIn().contains(application.getStatus())) {
@@ -136,14 +128,6 @@ public class MemberService {
         val memberEntity = new MemberEntity();
         memberEntity.setMemberReference(command.getMemberReference());
         memberEntity.setStatistics(new Statistics());
-        memberEntity.setContactData(createContactData(command.getContactDetails()));
         return memberEntity;
     }
-
-    private MemberEntity updateContactDetails(MemberEntity member, ContactDetails contactDetails) {
-        ContactData contactData = createContactData(contactDetails);
-        member.setContactData(contactData);
-        return memberRepository.save(member);
-    }
-
 }

@@ -6,9 +6,8 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
-public class MemberEntity {
-    private String id;
-    private String memberReference;
-    private Statistics statistics = new Statistics();
-}
+public class TotalStatisticsEntity {
 
+    private String id;
+    private Statistics statistics;
+}

@@ -4,18 +4,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.azure.eventmanager.domain.*;
-import com.azure.eventmanager.events.ApplicationCheckedInEvent;
-import com.azure.eventmanager.events.ApplicationInvalidPositionEvent;
-import com.azure.eventmanager.repository.OrganizationRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import com.azure.eventmanager.domain.ApplicationEntity;
+import com.azure.eventmanager.domain.Coordinates;
+import com.azure.eventmanager.domain.EventEntity;
+import com.azure.eventmanager.domain.OrganizationEntity;
+import com.azure.eventmanager.domain.Status;
+import com.azure.eventmanager.events.ApplicationCheckedInEvent;
+import com.azure.eventmanager.events.ApplicationInvalidPositionEvent;
 import com.azure.eventmanager.events.ApplicationSkippedEvent;
 import com.azure.eventmanager.maps.AzureMapsService;
 import com.azure.eventmanager.repository.ApplicationRepository;
 import com.azure.eventmanager.repository.EventRepository;
-import com.azure.eventmanager.vo.EmailCommunication;
+import com.azure.eventmanager.repository.OrganizationRepository;
 import com.azure.eventmanager.vo.Event;
 import com.azure.eventmanager.vo.Position;
 import com.azure.eventmanager.vo.RegisterEventCommand;
@@ -61,7 +64,7 @@ public class EventManagerService {
     }
 
     public List<Event> findEvents(String organizerUsername) {
-        val result = eventRepository.findAllByOrganizerUsername(organizerUsername);
+        val result = eventRepository.findAllByOrganizer(organizerUsername);
         return result.stream()
                 .map(entityMapper::map)
                 .collect(Collectors.toList());
@@ -133,13 +136,7 @@ public class EventManagerService {
     }
 
     private void sendLink(ApplicationEntity applicationEntity) {
-        EmailCommunication communication = new EmailCommunication();
-        val checkInLonk = String.format("http://localhost:8080/%s/check-in", applicationEntity.getApplicationReference());
-        communication.setTo("anna.hrunova93@gmail.com");
-        communication.setSubject("Check in!");
-        communication.setContent(String.format("Please, follow the link: %s to check-in", ""));
-        communicationService.sendEmail(communication);
-
+        communicationService.sendCheckInLink(applicationEntity.getContactData().getEmail(), applicationEntity.getEvent().getCode());
         applicationEntity.setStatus(Status.LINK_SENT);
         applicationRepository.save(applicationEntity);
     }

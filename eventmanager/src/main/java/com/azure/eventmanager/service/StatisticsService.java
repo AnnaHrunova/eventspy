@@ -3,13 +3,14 @@ package com.azure.eventmanager.service;
 import org.springframework.stereotype.Service;
 
 import com.azure.eventmanager.domain.EmailStatisticsEntity;
-import com.azure.eventmanager.domain.EventEntity;
 import com.azure.eventmanager.domain.MemberEntity;
 import com.azure.eventmanager.domain.PhoneStatisticsEntity;
 import com.azure.eventmanager.domain.Statistics;
+import com.azure.eventmanager.domain.TotalStatisticsEntity;
 import com.azure.eventmanager.repository.EmailStatisticsRepository;
 import com.azure.eventmanager.repository.MemberRepository;
 import com.azure.eventmanager.repository.PhoneStatisticsRepository;
+import com.azure.eventmanager.repository.TotalStatisticsRepository;
 
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -20,6 +21,7 @@ public class StatisticsService {
 
     private final EmailStatisticsRepository emailStatisticsRepository;
     private final PhoneStatisticsRepository phoneStatisticsRepository;
+    private final TotalStatisticsRepository totalStatisticsRepository;
     private final MemberRepository memberRepository;
 
     public EmailStatisticsEntity getEmailStatistics(String email) {
@@ -32,12 +34,19 @@ public class StatisticsService {
                 .orElse(createNewPhoneStatistics(phone));
     }
 
+    public TotalStatisticsEntity getTotalStatistics() {
+        val stats = totalStatisticsRepository.findAll();
+        if (stats.isEmpty()) {
+            return new TotalStatisticsEntity();
+        }
+        return stats.get(0);
+    }
+
     public EmailStatisticsEntity updateEmailStatisticsOnApply(String email) {
         val emailStatistics = getEmailStatistics(email);
         emailStatistics.getStatistics().increaseApplicationsCount();
         return emailStatisticsRepository.save(emailStatistics);
     }
-
 
     public PhoneStatisticsEntity updatePhoneStatisticsOnApply(String phone) {
 
@@ -140,6 +149,36 @@ public class StatisticsService {
         MemberEntity member = getMember(memberReference);
         member.getStatistics().increaseSkipCount();
         memberRepository.save(member);
+    }
+
+    public void updateTotalStatisticsOnCheckIn() {
+        TotalStatisticsEntity totalStat = getTotalStatistics();
+        totalStat.getStatistics().increaseCheckInCount();
+        totalStatisticsRepository.save(totalStat);
+    }
+
+    public void updateTotalStatisticsOnDecline() {
+        TotalStatisticsEntity totalStat = getTotalStatistics();
+        totalStat.getStatistics().increaseDeclineCount();
+        totalStatisticsRepository.save(totalStat);
+    }
+
+    public void updateTotalStatisticsOnApply() {
+        TotalStatisticsEntity totalStat = getTotalStatistics();
+        totalStat.getStatistics().increaseApplicationsCount();
+        totalStatisticsRepository.save(totalStat);
+    }
+
+    public void updateTotalStatisticsOnSkip() {
+        TotalStatisticsEntity totalStat = getTotalStatistics();
+        totalStat.getStatistics().increaseSkipCount();
+        totalStatisticsRepository.save(totalStat);
+    }
+
+    public void updateTotalStatisticsOnInvalidPosition() {
+        TotalStatisticsEntity totalStat = getTotalStatistics();
+        totalStat.getStatistics().increaseInvalidPositionCount();
+        totalStatisticsRepository.save(totalStat);
     }
 
     private MemberEntity getMember(final String memberReference) {

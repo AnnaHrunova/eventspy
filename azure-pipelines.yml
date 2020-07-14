@@ -1,7 +1,3 @@
-# Build and Deploy piggymetrics to Azure Kubernetes Service
-# Build and push image to Azure Container Registry; Deploy to Azure Kubernetes Service
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
   - master
 
@@ -25,6 +21,12 @@ stages:
         pool:
           vmImage: $(vmImageName)
         steps:
+          - task: AzureKeyVault@1
+            displayName: Fetch secrets from Azure Key vault
+            inputs:
+              azureSubscription: 'servconn'
+              KeyVaultName: 'evspykv'
+              SecretsFilter: '*'
 
           - task: Bash@3
             displayName: Build container images for each service
@@ -44,7 +46,8 @@ stages:
                 echo 'Start Build'
 
                 cd eventmanager
-                mvn compile jib:build
+                mvn compile jib:build \
+                  -Djib.container.environment=KV_CLIENT_ID=$(KV-CLIENT-ID);KV_CLIENT_KEY=$(KV-CLIENT-KEY);KV_TENANT_ID=$(KV-TENANT-ID)
 
                 echo 'Build complete'
 
@@ -65,12 +68,27 @@ stages:
           runOnce:
             deploy:
               steps:
+                - task: AzureKeyVault@1
+                  displayName: Fetch secrets from Azure Key vault
+                  inputs:
+                    azureSubscription: 'servconn'
+                    KeyVaultName: 'evspykv'
+                    SecretsFilter: '*'
                 - task: replacetokens@3
                   displayName: Replace CONTAINER_REGISTRY & IMAGE_TAG in all the manifest files
                   inputs:
                     targetFiles: '$(Pipeline.Workspace)/kubernetes/*.yaml'
                     tokenPrefix: '${'
                     tokenSuffix: '}'
+
+                - task: KubernetesManifest@0
+                  displayName: Create generic secrets to be available on pods
+                  inputs:
+                    action: 'createSecret'
+                    secretType: 'generic'
+                    secretName: 'evspykv'
+                    secretArguments: '--from-literal=kv_client_id=$(KV-CLIENT-ID) --from-literal=kv_client_key=$(KV-CLIENT-KEY) --from-literal=tenant_id=$(TENANT-ID)'
+
 
                 - task: KubernetesManifest@0
                   displayName: Deploy to Kubernetes cluster

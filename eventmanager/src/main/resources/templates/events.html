@@ -21,7 +21,6 @@
       <tbody>
       <tr th:each="event : ${events}">
         <td th:text="${event.organizer}"></td>
-        <td th:text="${event.platform}"></td>
         <td th:text="${event.code}"></td>
         <td><a th:href="@{/events/details/} + ${event.code}">Edit/Details</a></td>
       </tr>
