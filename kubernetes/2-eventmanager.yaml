@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    service.beta.kubernetes.io/azure-load-balancer-resource-group: azure-k8s-test
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: azure-k8s
   labels:
     project: eventspy
     tier: middleware
@@ -64,5 +64,5 @@ spec:
           ports:
             - containerPort: 9999
           resources: {}
-        restartPolicy: Always
-status: {}
+      restartPolicy: Always
+  status: {}
