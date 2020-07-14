@@ -85,7 +85,7 @@ stages:
                     action: 'createSecret'
                     secretType: 'generic'
                     secretName: 'evspykv'
-                    secretArguments: '--from-literal=kv_client_id=$(KV-CLIENT-ID) --from-literal=kv_client_key=$(KV-CLIENT-KEY) --from-literal=tenant_id=$(TENANT-ID)'
+                    secretArguments: '--from-literal=kv_client_id=$(KV-CLIENT-ID) --from-literal=kv_client_key=$(KV-CLIENT-KEY) --from-literal=kv_tenant_id=$(KV-TENANT-ID)'
 
 
                 - task: KubernetesManifest@0
