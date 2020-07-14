@@ -65,4 +65,7 @@ spec:
             - containerPort: 9999
           resources: {}
       restartPolicy: Always
+  selector:
+    matchLabels:
+      app: eventmanager
 status: {}
