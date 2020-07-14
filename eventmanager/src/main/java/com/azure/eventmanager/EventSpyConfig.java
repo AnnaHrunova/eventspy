@@ -38,8 +38,9 @@ public class EventSpyConfig {
     }
 
     @Bean
-    public MlService mlService(final RestTemplateBuilder restTemplateBuilder) {
-        return new MlService(restTemplate(restTemplateBuilder));
+    public MlService mlService(final RestTemplateBuilder restTemplateBuilder,
+                               @Value("${mlScoreUrl}") String mlScoreUrl) {
+        return new MlService(restTemplate(restTemplateBuilder), mlScoreUrl);
     }
 
     @Bean
@@ -60,8 +61,8 @@ public class EventSpyConfig {
     }
 
     @Bean
-    public QueueClient queue(EventManagerService eventManagerService) throws ServiceBusException, InterruptedException {
-        QueueClient queueClient = new QueueClient(new ConnectionStringBuilder("Endpoint=sb://evspyq.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=jg8z5qNnOLO9DeeSi5JZpzE3q3xJJntKMHOuNRC1P4Y=", "coordinates"), ReceiveMode.PEEKLOCK);
+    public QueueClient queue(@Value("${queNameSpace}") String queNameSpace, EventManagerService eventManagerService) throws ServiceBusException, InterruptedException {
+        QueueClient queueClient = new QueueClient(new ConnectionStringBuilder(queNameSpace, "coordinates"), ReceiveMode.PEEKLOCK);
         queueClient.registerMessageHandler(coordinatesMessageListener(eventManagerService));
         return queueClient;
     }

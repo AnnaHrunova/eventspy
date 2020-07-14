@@ -2,20 +2,17 @@
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    service.beta.kubernetes.io/azure-load-balancer-resource-group: azure-k8s
   labels:
     project: eventspy
     tier: middleware
     app: eventmanager
   name: eventmanager
 spec:
-  loadBalancerIP: 40.127.230.103
   type: LoadBalancer
   ports:
-  - name: https
-    port: 9999
-    targetPort: 9999
+    - name: http
+      port: 9999
+      targetPort: 9999
   selector:
     project: eventspy
     tier: middleware

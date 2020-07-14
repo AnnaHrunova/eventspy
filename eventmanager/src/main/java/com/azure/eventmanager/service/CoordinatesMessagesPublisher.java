@@ -6,7 +6,9 @@ import com.google.gson.reflect.TypeToken;
 import com.microsoft.azure.servicebus.*;
 import com.microsoft.azure.servicebus.primitives.ConnectionStringBuilder;
 import com.google.gson.Gson;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import static java.nio.charset.StandardCharsets.*;
@@ -16,12 +18,14 @@ import java.util.*;
 import java.util.concurrent.*;
 
 @Component
+@RequiredArgsConstructor
 public class CoordinatesMessagesPublisher {
 
+    @Value("${serviceBusConnStr}") String serviceBusConnStr;
     static final Gson GSON = new Gson();
 
     public void publish(String queueName, CheckInMessage checkInMessage) throws Exception {
-        QueueClient sendClient = new QueueClient(new ConnectionStringBuilder("Endpoint=sb://evspyq.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=jg8z5qNnOLO9DeeSi5JZpzE3q3xJJntKMHOuNRC1P4Y=", queueName), ReceiveMode.PEEKLOCK);
+        QueueClient sendClient = new QueueClient(new ConnectionStringBuilder("", queueName), ReceiveMode.PEEKLOCK);
         sendMessageAsync(sendClient, checkInMessage).thenRunAsync(() -> sendClient.closeAsync());
     }
 
