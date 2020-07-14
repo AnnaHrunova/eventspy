@@ -9,5 +9,5 @@ import lombok.Data;
 public class TotalStatisticsEntity {
 
     private String id;
-    private Statistics statistics;
+    private Statistics statistics = new Statistics();
 }
