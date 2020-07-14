@@ -22,7 +22,6 @@ public class CommandMapper {
                 .name(request.getName())
                 .address(request.getAddress())
                 .organizer(request.getOrganizer())
-                .platform(request.getPlatform())
                 .address(request.getAddress())
                 .eventStart(request.getEventStart())
                 .eventEnd(request.getEventEnd())

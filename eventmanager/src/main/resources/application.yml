@@ -28,5 +28,5 @@ spring:
       database: eventspydb
       uri: mongodb://eventspydb:lXL8XflWPt6Eqkl0PXpSbgxbvkIOLRdvqCvHaYIvyHzdJvR11DuhYRn7txdLqSmTvT8UacWXBkZV42SmUV6ctQ==@eventspydb.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@eventspydb@
 
-#server:
-#  port: 9999
+server:
+  port: 9999

@@ -10,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 public class RegisterEventRequest {
     private String name;
     private String organizer;
-    private String platform;
     private String address;
 
     @DateTimeFormat(pattern = "dd.MM.yyyy HH:mm")

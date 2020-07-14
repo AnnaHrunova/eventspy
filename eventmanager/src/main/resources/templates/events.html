@@ -12,14 +12,14 @@
     <table class="darkTable">
       <thead>
       <tr>
+        <th>Name</th>
         <th>Organizer</th>
-        <th>Platform</th>
         <th>Code</th>
-        <th>+</th>
       </tr>
       </thead>
       <tbody>
       <tr th:each="event : ${events}">
+        <td th:text="${event.name}"></td>
         <td th:text="${event.organizer}"></td>
         <td th:text="${event.code}"></td>
         <td><a th:href="@{/events/details/} + ${event.code}">Edit/Details</a></td>

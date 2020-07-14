@@ -39,7 +39,7 @@ public class EventManagerBackofficeController {
         val command = mapper.map(request);
         command.setOrganizer(organizer);
         eventManagerService.registerEvent(command);
-        return new ModelAndView(String.format("redirect:%s/%s", request.getPlatform(), request.getOrganizer()));
+        return new ModelAndView(String.format("redirect:%s", request.getOrganizer()));
     }
 
     @PreAuthorize("hasRole('users')")
